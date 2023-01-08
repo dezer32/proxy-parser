@@ -1,2 +1,4 @@
 /.idea/
-/proxies.json
+/*.json
+/check
+/load

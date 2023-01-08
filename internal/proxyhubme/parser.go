@@ -1,15 +1,12 @@
 package proxyhubme
 
 import (
+	"github.com/dezer32/parser-proxyhub.me/internal/proxy"
 	"log"
 	"net/http"
 	"strconv"
 	"sync"
-)
-
-const (
-	baseUrl = "https://proxyhub.me/"
-	//baseUrl = "https://httpbin.org/headers"
+	"time"
 )
 
 var (
@@ -24,36 +21,37 @@ func init() {
 	wgProxy = sync.WaitGroup{}
 }
 
-func Parse() []Proxy {
-	var res []Proxy
+func Parse(pages int, path string) *proxy.Proxies {
+	if path != "" {
+		client.withPath(path)
+	}
+
+	var res proxy.Proxies
 	cookieCh := make(chan *http.Cookie)
-	proxiesCh := make(chan []Proxy)
+	proxiesCh := make(chan []proxy.Proxy)
 	go getData(cookieCh, proxiesCh)
 
-	pages := 100
 	wgMain.Add(pages)
 	for i := 1; i <= pages; i++ {
 		log.Printf("Run load %d page.", i)
-		//getData(&http.Cookie{
-		//	Name:  "page",
-		//	Value: strconv.Itoa(i),
-		//}, proxiesCh)
+		time.Sleep(5 * time.Second)
 		cookieCh <- &http.Cookie{
 			Name:  "page",
 			Value: strconv.Itoa(i),
 		}
 
-		res = append(res, <-proxiesCh...)
+		res.List = append(res.List, <-proxiesCh...)
+		res.Save("temp")
 		log.Printf("Loaded %d page.", i)
 	}
 
 	wgMain.Wait()
 
-	return res
+	return &res
 }
 
 // func getData(Cookie *http.Cookie, proxiesCh chan []Proxy) {
-func getData(cookieCh chan *http.Cookie, proxiesCh chan []Proxy) {
+func getData(cookieCh chan *http.Cookie, proxiesCh chan []proxy.Proxy) {
 	for cookie := range cookieCh {
 		client.withCookie(cookie)
 

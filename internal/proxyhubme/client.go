@@ -2,21 +2,26 @@ package proxyhubme
 
 import (
 	"errors"
+	"github.com/dezer32/parser-proxyhub.me/internal/proxy"
 	"golang.org/x/net/html"
 	"io"
 	"log"
 	"net/http"
 	"net/http/cookiejar"
+	"net/url"
 	"strconv"
 )
 
 type ProxyhubMe struct {
 	Client  http.Client
+	Path    *url.URL
 	Cookie  *http.Cookie
 	Headers map[string]string
 }
 
 func (p *ProxyhubMe) init() {
+	p.Path, _ = url.Parse("https://proxyhub.me/")
+
 	jar, err := cookiejar.New(nil)
 	logErr(err)
 
@@ -42,8 +47,12 @@ func (p *ProxyhubMe) withCookie(cookie *http.Cookie) {
 	p.Cookie = cookie
 }
 
+func (p *ProxyhubMe) withPath(path string) {
+	p.Path = p.Path.JoinPath(path)
+}
+
 func (p *ProxyhubMe) getBody() io.ReadCloser {
-	req, err := http.NewRequest("GET", baseUrl, nil)
+	req, err := http.NewRequest("GET", p.Path.String(), nil)
 	logErr(err)
 	req.AddCookie(p.Cookie)
 
@@ -58,7 +67,7 @@ func (p *ProxyhubMe) getBody() io.ReadCloser {
 	return resp.Body
 }
 
-func (p *ProxyhubMe) getProxies() []Proxy {
+func (p *ProxyhubMe) getProxies() []proxy.Proxy {
 	body := p.getBody()
 	defer body.Close()
 
@@ -67,7 +76,7 @@ func (p *ProxyhubMe) getProxies() []Proxy {
 	tn, err := getFragment(doc, "tbody")
 	logErr(err)
 
-	var res []Proxy
+	var res []proxy.Proxy
 	for child := tn.FirstChild; child != nil; child = child.NextSibling {
 		res = append(res, parseProxy(child))
 	}
@@ -77,9 +86,9 @@ func (p *ProxyhubMe) getProxies() []Proxy {
 	return res
 }
 
-func parseProxy(doc *html.Node) Proxy {
+func parseProxy(doc *html.Node) proxy.Proxy {
 	iter := 0
-	p := Proxy{}
+	p := proxy.Proxy{}
 
 	for child := doc.FirstChild; child != nil; child = child.NextSibling {
 		iter++

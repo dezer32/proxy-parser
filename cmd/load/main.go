@@ -1,23 +1,21 @@
 package main
 
 import (
-	"encoding/json"
 	"github.com/dezer32/parser-proxyhub.me/internal/proxyhubme"
-	"log"
 	"os"
+	"strconv"
 )
 
 func main() {
-	file, err := os.Create("proxies.json")
-	if err != nil {
-		log.Fatalf("Open file failed. Error: %s", err)
+	pages := 100
+	path := ""
+	if os.Args[1] != "" {
+		pages, _ = strconv.Atoi(os.Args[1])
 	}
-	defer file.Close()
+	if os.Args[2] != "" {
+		path = os.Args[2]
+	}
 
-	proxies := proxyhubme.Parse()
-	j, _ := json.Marshal(proxies)
-
-	log.Printf("Done loaded proxies (%d).", len(proxies))
-
-	file.Write(j)
+	proxies := proxyhubme.Parse(pages, path)
+	proxies.Save("proxies")
 }

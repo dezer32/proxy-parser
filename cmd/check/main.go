@@ -1,40 +1,68 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/dezer32/parser-proxyhub.me/internal/proxyhubme"
+	"github.com/dezer32/parser-proxyhub.me/internal/proxy"
 	"log"
 	"os"
+	"sync"
+	"time"
+)
+
+var (
+	wgMain  = sync.WaitGroup{}
+	wgProxy = sync.WaitGroup{}
 )
 
 func main() {
 	fileName := "proxies.json"
+	if os.Args[1] != "" {
+		fileName = os.Args[1]
+	}
+	proxies := proxy.Proxies{}
+	proxies.Load(fileName)
 
-	data, err := os.ReadFile(fileName)
-	if err != nil {
-		log.Fatal(err)
+	verifiedProxyChan := make(chan proxy.Proxy)
+	for _, p := range proxies.List {
+		wgMain.Add(1)
+		go func(rawProxy proxy.Proxy, verifiedProxyCh chan proxy.Proxy) {
+			rawProxy.Check()
+			wgMain.Done()
+
+			if rawProxy.IsWorked == true {
+				wgProxy.Add(1)
+				verifiedProxyChan <- rawProxy
+
+			}
+		}(p, verifiedProxyChan)
 	}
 
-	var proxies []proxyhubme.Proxy
-	err = json.Unmarshal(data, &proxies)
-	if err != nil {
-		log.Fatal(err)
+	wgMain.Wait()
+
+	verifiedProxies := proxy.Proxies{}
+	timeout := time.After(15 * time.Second)
+
+	isBreak := false
+	for !isBreak {
+		select {
+		case verifiedProxy := <-verifiedProxyChan:
+			verifiedProxies.List = append(verifiedProxies.List, verifiedProxy)
+			verifiedProxies.Save("temp.checked.proxies")
+			wgProxy.Done()
+		case <-timeout:
+			isBreak = true
+		}
 	}
 
-	//proxies[0].Check()
+	verifiedProxies.Save("checked")
 
-	proxyCh := make(chan proxyhubme.Proxy)
-	go check(proxyCh)
-
-	for _, proxy := range proxies {
-		proxyCh <- proxy
-	}
+	wgProxy.Wait()
 
 	log.Printf("Done")
 }
 
-func check(proxyCh chan proxyhubme.Proxy) {
-	for proxy := range proxyCh {
-		proxy.Check()
-	}
-}
+//func check(proxyCh chan *proxy.Proxy) {
+//	for p := range proxyCh {
+//		p.Check()
+//		wg.Done()
+//	}
+//}
