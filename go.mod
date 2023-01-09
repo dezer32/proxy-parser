@@ -3,7 +3,7 @@ module github.com/dezer32/parser-proxyhub.me
 go 1.19
 
 require (
-	github.com/dezer32/proxy-checker v1.0.3
+	github.com/dezer32/proxy-checker v1.0.5
 	golang.org/x/net v0.5.0
 )
 

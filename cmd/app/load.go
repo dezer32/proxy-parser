@@ -22,7 +22,7 @@ var (
 func init() {
 	wg = sync.WaitGroup{}
 
-	defaultOutputFileName := fmt.Sprintf("proxies.checked.%d.json", time.Now().Unix())
+	defaultOutputFileName := fmt.Sprintf("proxies.%d.json", time.Now().Unix())
 
 	flag.StringVar(&fileName, "o", defaultOutputFileName, "File to save proxies")
 	flag.IntVar(&pages, "n", 100, "# pages to load")

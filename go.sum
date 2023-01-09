@@ -5,6 +5,10 @@ github.com/dezer32/proxy-checker v1.0.0 h1:gh+vO7nKv8hZ1seo5BQJdlLo3+dqKSBshYk2z
 github.com/dezer32/proxy-checker v1.0.0/go.mod h1:XJGslEOxAvKvDUxAR03h/sEkK8MhVALoBB4G+vrwpIs=
 github.com/dezer32/proxy-checker v1.0.3 h1:Uxh1MQUlNk3ynuoAwgD6NUbJlYCtEKqXzhL2HGFB27A=
 github.com/dezer32/proxy-checker v1.0.3/go.mod h1:XJGslEOxAvKvDUxAR03h/sEkK8MhVALoBB4G+vrwpIs=
+github.com/dezer32/proxy-checker v1.0.4 h1:MUgYWV9np88qNRxm+DzXwuAoS0KbPG4ndfnYn8TPRzU=
+github.com/dezer32/proxy-checker v1.0.4/go.mod h1:XJGslEOxAvKvDUxAR03h/sEkK8MhVALoBB4G+vrwpIs=
+github.com/dezer32/proxy-checker v1.0.5 h1:Tbexz2d6ZOUUJBG9mN+cL6YKHeYmQFz2NeB7YWCLseI=
+github.com/dezer32/proxy-checker v1.0.5/go.mod h1:DOgW2kkuzaS7IWdyHPujiikdjwkNTv7WdOTFlBiDSh8=
 github.com/gookit/color v1.5.2 h1:uLnfXcaFjlrDnQDT+NCBcfhrXqYTx/rcCa6xn01Y8yI=
 github.com/gookit/color v1.5.2/go.mod h1:w8h4bGiHeeBpvQVePTutdbERIUf3oJE5lZ8HM0UgXyg=
 github.com/gookit/goutil v0.6.1 h1:EsaMR1QWxg61R8oBW7sbSHUxQzMZUKTDUEAKpsHUXJI=

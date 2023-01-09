@@ -62,7 +62,6 @@ func (p *ProxyhubMe) getBody() io.ReadCloser {
 
 	resp, err := p.Client.Do(req)
 	logErr(err)
-	log.Printf("Loaded page (%s).", p.Cookie.Value)
 
 	return resp.Body
 }
