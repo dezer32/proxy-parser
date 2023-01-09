@@ -34,8 +34,7 @@ func (p *Proxy) Check() bool {
 	}
 
 	log.Printf("Check proxy %s.", proxyUrl)
-	//resp, err := client.Get("https://httpbin.org/ip")
-	resp, err := client.Get("https://ya.ru")
+	resp, err := client.Get("https://google.com")
 	if err != nil {
 		log.Printf("For proxy %s, error %s", proxyUrl, err)
 		return false
