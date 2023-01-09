@@ -1,7 +1,7 @@
 package proxyhubme
 
 import (
-	"github.com/dezer32/parser-proxyhub.me/internal/proxy"
+	"github.com/dezer32/proxy-checker/pkg/proxy"
 	"log"
 	"net/http"
 	"strconv"
@@ -21,14 +21,12 @@ func init() {
 	wgProxy = sync.WaitGroup{}
 }
 
-func Parse(pages int, path string) *proxy.Proxies {
+func Parse(pages int, path string, proxiesCh chan []proxy.Proxy, wg *sync.WaitGroup) {
 	if path != "" {
 		client.withPath(path)
 	}
 
-	var res proxy.Proxies
 	cookieCh := make(chan *http.Cookie)
-	proxiesCh := make(chan []proxy.Proxy)
 	go getData(cookieCh, proxiesCh)
 
 	wgMain.Add(pages)
@@ -40,14 +38,11 @@ func Parse(pages int, path string) *proxy.Proxies {
 			Value: strconv.Itoa(i),
 		}
 
-		res.List = append(res.List, <-proxiesCh...)
-		res.Save("temp")
 		log.Printf("Loaded %d page.", i)
 	}
 
 	wgMain.Wait()
-
-	return &res
+	wg.Done()
 }
 
 // func getData(Cookie *http.Cookie, proxiesCh chan []Proxy) {

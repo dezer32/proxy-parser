@@ -2,7 +2,7 @@ package proxyhubme
 
 import (
 	"errors"
-	"github.com/dezer32/parser-proxyhub.me/internal/proxy"
+	"github.com/dezer32/proxy-checker/pkg/proxy"
 	"golang.org/x/net/html"
 	"io"
 	"log"
@@ -96,15 +96,12 @@ func parseProxy(doc *html.Node) proxy.Proxy {
 		case 1:
 			p.Ip = child.FirstChild.Data
 		case 2:
-			p.Port, _ = strconv.Atoi(child.FirstChild.Data)
+			port, _ := strconv.Atoi(child.FirstChild.Data)
+			p.Port = uint(port)
 		case 3:
 			p.Protocol = child.FirstChild.Data
-		case 4:
-			p.Anonymity = child.FirstChild.Data
 		case 5:
 			p.Country = child.LastChild.FirstChild.Data
-		case 6:
-			p.City = child.FirstChild.Data
 		}
 	}
 
@@ -127,7 +124,7 @@ func getFragment(doc *html.Node, tagName string) (*html.Node, error) {
 	if body != nil {
 		return body, nil
 	}
-	return nil, errors.New("Missing <body> in the doc tree")
+	return nil, errors.New("missing <body> in the doc tree")
 }
 
 func logErr(err error) {
